@@ -1,0 +1,220 @@
+{
+	"info": {
+		"_postman_id": "45a882b6-da55-414c-a1e2-18ce80cb1045",
+		"name": "Add Model HA Clusters to FMG",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4207362"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"",
+							"postman.setEnvironmentVariable('session',data['session']);",
+							"postman.setEnvironmentVariable('status_code',data['result'][0]['status']['code']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"session\" : 1,\r\n\t\"method\" : \"exec\",\r\n\t\"params\" : [\r\n\t\t{\r\n\t\t\t\"url\" : \"sys/login/user\",\r\n\t\t\t\"data\" : [\r\n\t\t\t\t{\r\n\t\t\t\t\t\"user\" : \"{{username}}\",\r\n\t\t\t\t\t\"passwd\" : \"{{password}}\"\r\n\t\t\t\t}\r\n\t\t\t]\r\n\t\t}\r\n\t]\r\n}"
+				},
+				"url": {
+					"raw": "https://{{ip}}:{{port}}/jsonrpc",
+					"protocol": "https",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"jsonrpc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add_model",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"",
+							"postman.setEnvironmentVariable('session',data['session']);",
+							"postman.setEnvironmentVariable('status_code',data['result'][0]['status']['code']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"method\": \"exec\",\r\n  \"params\": [\r\n    {\r\n      \"data\": {\r\n        \"adom\": \"root\",\r\n        \"device\": {\r\n          \"adm_usr\": \"admin\",\r\n          \"build\": 1575,\r\n          \"extra commands\": [\r\n            {\r\n              \"method\": \"update\",\r\n              \"params\": [\r\n                {\r\n                  \"url\": \"/pm/config/device/%s/global/system/ha\",\r\n                  \"data\": {\r\n                    \"password\": \"my_password\",\r\n                    \"hbdev\": [\r\n                      \"ha1\",\r\n                      0,\r\n                      \"ha2\",\r\n                      0\r\n                    ],\r\n                    \"monitor\":[\r\n                        \"port12\"\r\n                    ],\r\n                  }\r\n                }\r\n              ]\r\n            }\r\n          ],\r\n          \"faz.perm\": 15,\r\n          \"faz.quota\": 0,\r\n          \"flags\": 67371040,\r\n          \"ha_group_id\": 1,\r\n          \"ha_group_name\": \"TestFGT\",\r\n          \"ha_mode\": 1,\r\n          \"ha_slave\": [\r\n            {\r\n              \"idx\": 0,\r\n              \"sn\": \"FG100FTK21048360\",\r\n              \"name\": \"TestFGT\",\r\n              \"role\": 1,\r\n              \"prio\": 200\r\n            },\r\n            {\r\n              \"sn\": \"FG100FTK21049011\",\r\n              \"prio\": 100,\r\n              \"idx\": 1,\r\n              \"name\": \"TestFGT-1\",\r\n              \"role\": 0\r\n            }\r\n          ],\r\n          \"mgmt_mode\": 3,\r\n          \"mr\": 2,\r\n          \"name\": \"TestFGT\",\r\n          \"os_type\": 0,\r\n          \"os_ver\": 7,\r\n          \"platform_str\": \"FortiGate-100F\",\r\n          \"prefer_img_ver\": \"7.2.6-b1575\",\r\n          \"sn\": \"FG100FTK21048360\",\r\n          \"version\": 700\r\n        },\r\n        \"flags\": [\r\n          \"create_task\",\r\n          \"nonblocking\"\r\n        ],\r\n        \"groups\":[\r\n            { \"name\": \"EAME\" }\r\n        ]\r\n      },\r\n      \"url\": \"/dvm/cmd/add/device\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\",\r\n  \"id\": 1\r\n}"
+				},
+				"url": {
+					"raw": "https://{{ip}}:{{port}}/jsonrpc",
+					"protocol": "https",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"jsonrpc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "attach_prerun",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"",
+							"postman.setEnvironmentVariable('session',data['session']);",
+							"postman.setEnvironmentVariable('status_code',data['result'][0]['status']['code']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"method\": \"add\",\r\n  \"params\": [\r\n    {\r\n      \"data\": {\r\n        \"name\": \"TestFGT\",\r\n        \"vdom\": \"global\"\r\n      },\r\n      \"url\": \"/pm/config/adom/root/obj/cli/template/initial-setup/scope member\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\",\r\n  \"id\": 1\r\n}"
+				},
+				"url": {
+					"raw": "https://{{ip}}:{{port}}/jsonrpc",
+					"protocol": "https",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"jsonrpc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update_metadata",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"",
+							"postman.setEnvironmentVariable('session',data['session']);",
+							"postman.setEnvironmentVariable('status_code',data['result'][0]['status']['code']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"method\": \"add\",\r\n  \"params\": [\r\n    {\r\n      \"data\": {\r\n        \"_scope\": [\r\n          {\r\n            \"name\": \"TestFGT\",\r\n            \"vdom\": \"global\"\r\n          }\r\n        ],\r\n        \"value\": \"192.168.1.254\"\r\n      },\r\n      \"url\": \"/pm/config/adom/root/obj/fmg/variable/mgmt_dgw/dynamic_mapping\"\r\n    },\r\n    {\r\n      \"data\": {\r\n        \"_scope\": [\r\n          {\r\n            \"name\": \"TestFGT\",\r\n            \"vdom\": \"global\"\r\n          }\r\n        ],\r\n        \"value\": \"192.168.1.1/24\"\r\n      },\r\n      \"url\": \"/pm/config/adom/root/obj/fmg/variable/mgmt_ip_nm/dynamic_mapping\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\",\r\n  \"id\": 1\r\n}"
+				},
+				"url": {
+					"raw": "https://{{ip}}:{{port}}/jsonrpc",
+					"protocol": "https",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"jsonrpc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"",
+							"postman.setEnvironmentVariable('session',data['session']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"session\" : \"{{session}}\",\r\n  \"id\" : 1,\r\n  \"method\" : \"exec\",\r\n  \"params\" : [\r\n    {\r\n      \"url\" : \"/sys/logout\"\r\n    }\r\n  ]\r\n}"
+				},
+				"url": {
+					"raw": "https://{{ip}}:{{port}}/jsonrpc",
+					"protocol": "https",
+					"host": [
+						"{{ip}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"jsonrpc"
+					]
+				},
+				"description": "Log out a session."
+			},
+			"response": []
+		}
+	]
+}
