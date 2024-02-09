@@ -1,13 +1,16 @@
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import pandas as pd
+import json
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 USERNAME = 'admin'
 PASSWORD = 'pixxpass'
 IP = '127.0.0.1'
-SESSION = '10009'
+PORT = '10009'
+SESSION = ''
+URL = 'https://'+IP+':'+PORT+'/jsonrpc'
 
 def login():
     payload = json.dumps({
@@ -26,7 +29,9 @@ def login():
         'Content-Type':'application/json'
     }
 
-    return requests.request("POST", URL, headers=headers, data=payload, verify=False)
+    req =  requests.request("POST", URL, headers=headers, data=payload, verify=False)
+    print(req.text)
+    return req
 def logout():
     payload = json.dumps({
         "session": SESSION,
@@ -40,7 +45,9 @@ def logout():
         'Content-Type':'application/json'
     }
     
-    return requests.request("POST", URL, headers=headers, data=payload, verify=False)
+    req = requests.request("POST", URL, headers=headers, data=payload, verify=False)
+    print(req.text)
+    return req
 def add_model_ha_device(adom,device_name,primary_sn,secondary_sn,device_group):
     payload = json.dumps({
       "method": "exec",
@@ -88,7 +95,7 @@ def add_model_ha_device(adom,device_name,primary_sn,secondary_sn,device_group):
                   "prio": 200
                 },
                 {
-                  "sn": "FG100FTK21049011",
+                  "sn": secondary_sn,
                   "prio": 100,
                   "idx": 1,
                   "name": device_name+"-1",
@@ -106,8 +113,7 @@ def add_model_ha_device(adom,device_name,primary_sn,secondary_sn,device_group):
               "version": 700
             },
             "flags": [
-              "create_task",
-              "nonblocking"
+              "create_task"
             ],
             "groups":[
                 { "name": device_group }
@@ -123,13 +129,18 @@ def add_model_ha_device(adom,device_name,primary_sn,secondary_sn,device_group):
       'Content-Type': 'application/json'
     }
 
-    return requests.request("POST", URL, headers=headers, data=payload, verify=False)
-def attach_prerun_template(address):
+    req = requests.request("POST", URL, headers=headers, data=payload, verify=False)
+    print(req.text)
+def attach_prerun_template(adom,device_name,pre_run_template):
     payload = json.dumps({
-      "method": "get",
+      "method": "add",
       "params": [
         {
-          "url": "/pm/config/adom/"+ADOM+"/obj/firewall/address/"+address
+          "data": {
+            "name": device_name,
+            "vdom": "global"
+          },
+          "url": "/pm/config/adom/"+adom+"/obj/cli/template/"+pre_run_template+"/scope member"
         }
       ],
       "session": SESSION,
@@ -139,23 +150,38 @@ def attach_prerun_template(address):
       'Content-Type': 'application/json'
     }
 
-    return requests.request("POST", URL, headers=headers, data=payload, verify=False)
-def update_metadata(address):
-    payload = json.dumps({
-      "method": "get",
-      "params": [
-        {
-          "url": "/pm/config/adom/"+ADOM+"/obj/firewall/address/"+address
-        }
-      ],
+    req = requests.request("POST", URL, headers=headers, data=payload, verify=False)
+    print(req.text)
+def update_metadata(adom,device_name,params):
+    query = {
+      "method": "add",
+      "params": [],
       "session": SESSION,
       "id": 1
-    })
+    }
+    
+    for key,value in params.items():
+        metadata_query = {
+          "data": {
+            "_scope": [
+              {
+                "name": device_name,
+                "vdom": "global"
+              }
+            ],
+            "value": str(value)
+          },
+          "url": "/pm/config/adom/"+adom+"/obj/fmg/variable/"+key+"/dynamic_mapping"
+        }
+        query['params'].append(metadata_query)
+
+    payload = json.dumps(query)
     headers = {
       'Content-Type': 'application/json'
     }
 
-    return requests.request("POST", URL, headers=headers, data=payload, verify=False)
+    req = requests.request("POST", URL, headers=headers, data=payload, verify=False)
+    print(req.text)
 
 ## Reading Excel Configuration
 config_file = pd.ExcelFile('device_list.xlsx')
@@ -184,7 +210,9 @@ for device in ha_file.to_dict(orient='records'):
         'mgmt_gateway': device['mgmt_gateway']
     }
 
-    add_model_device(adom,device_name,primary_sn,secondary_sn,device_group)
+    add_model_ha_device(adom,device_name,primary_sn,secondary_sn,device_group)
+    attach_prerun_template(adom,device_name,pre_run_template)
+    update_metadata(adom,device_name,params)
 
 # logout
 logout()
